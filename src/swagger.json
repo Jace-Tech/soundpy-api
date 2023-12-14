@@ -1,0 +1,77 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "API Name",
+    "description": "API description",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "foo",
+      "description": "Foo summary"
+    },
+    {
+      "name": "bar",
+      "description": "Bar summary"
+    }
+  ],
+  "paths": {
+    "path/foo/bar": {
+      "post": {
+        "tags": ["foo", "bar"],
+        "parameters": [
+          {
+            "name": "required params",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "foo1": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "name": "optional params",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "bar": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "summary": "Api summary",
+        "responses": {
+          "200": {
+            
+          }
+        }
+      }
+    }
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json",
+    "x-www-form-urlencoded",
+    "form-data"
+  ],
+  "produces": [
+    "application/json"
+  ]
+}
