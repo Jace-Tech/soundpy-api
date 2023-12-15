@@ -18,7 +18,7 @@ export const handleUpdateUserProfle = async (req: Request<{}, {}, IUser> & Reque
   if (!req.body.genre) throw new BadRequestError("Genre is required")
 
   // GET USERS DETAILS
-  const user = await User.findById(req.user._id).populate("genre")
+  const user = await User.findById(req.user._id)
 
   // CHECK IF USER EXISTS
   if (!user) throw new NotFoundError("Unknown user, please login")
@@ -33,7 +33,7 @@ export const handleUpdateUserProfle = async (req: Request<{}, {}, IUser> & Reque
   const pronoun = getPronoun(updatedProfile?.gender)
   const notification: INotification = {
     message: `<b>${user.username}</b> just <b>updated</b> ${pronoun} profile`,
-    title: "Profile Update"
+    title: "Profile Update",
   }
   await NotifyAdmin(notification)
 

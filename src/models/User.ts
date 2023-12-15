@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema<IUser>(
       enum: ["producer", "artist", "music lover"],
     },
     genre:  {
-      type: Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "Genre",
       default: null
     },

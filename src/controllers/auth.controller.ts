@@ -46,7 +46,7 @@ export const handleSignIn = async (req: Request<{}, {}, AuthResult>, res: Respon
     if (!user.isActive) throw new UnAuthorizedError("Account not active")
 
     const token = generateToken({ userId: user._id as any, role: user.role! })
-    return res.status(200).send(response("Logged in", { user, token }))
+    return res.status(200).send(response("Logged in", { user, token, isNew: false }))
   }
 
   // ELSE IF NOT EXISTING
@@ -61,7 +61,7 @@ export const handleSignIn = async (req: Request<{}, {}, AuthResult>, res: Respon
 
   // SEND RESPONSE
   const token = generateToken({ userId: user._id as any, role: user.role! })
-  res.status(201).send(response("Account Created!", { user, token }))
+  res.status(201).send(response("Account Created!", { user, token, isNew: true }))
 }
 
 // ADMIN REGISTER

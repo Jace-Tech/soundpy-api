@@ -9,7 +9,8 @@ const notificationSchema = new mongoose.Schema<INotification>({
   },
   type: {
     type: String,
-    required: true
+    required: false,
+    default: null
   },
   message: {
     type: String,
