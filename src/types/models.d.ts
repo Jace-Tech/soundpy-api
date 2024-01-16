@@ -123,6 +123,14 @@ export interface IComment {
   date: Date;
 }
 
+export interface IReply {
+  _id?: mongoose.Schema.Types.ObjectId;
+  user:  mongoose.Schema.Types.ObjectId;
+  comment:  mongoose.Schema.Types.ObjectId;
+  reply: string;
+  date: Date;
+}
+
 export interface IGenre {
   _id?: mongoose.Schema.Types.ObjectId;
   name: string;

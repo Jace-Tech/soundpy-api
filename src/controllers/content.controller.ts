@@ -5,7 +5,7 @@ import { fileUpload, uploadBinary } from "../utils/uploader";
 import { getSlug } from "../utils/functions";
 import Content from "../models/Content";
 import { PaymentDTO, RequestAlt } from "../types/common";
-import { NotifyAdmin } from "./common.controller";
+import { NotifyAdmin, NotifyUser } from "./common.controller";
 import { response } from "../utils/response";
 import BlockedContent from "../models/BlockedContent";
 import Like from "../models/Like";
@@ -13,6 +13,7 @@ import Comment from "../models/Comment";
 import { getContents } from "../store/content";
 import Report from "../models/Report";
 import Transaction from "../models/Transaction";
+import Reply from "../models/Reply";
 
 // HANDLES CONTENT UPLOAD
 export const handleAddContent = async (req: Request<{}, {}, IContent & { file: any }> & RequestAlt, res: Response) => {	 
@@ -33,9 +34,6 @@ export const handleAddContent = async (req: Request<{}, {}, IContent & { file: a
   if(transaction.status !== "success") throw new BadRequestError("Transaction was not success");
 
   // CHECK IF CONTENT EXISTS
-  const titleExists = await Content.findOne({ title:req.body.title, user: req.user._id })
-  if(titleExists) throw new BadRequestError("Title already exist!")
-
   const exists = await Content.findOne({ title:req.body.title, genre: req.body.genre, type: "beat", user: req.user._id })
   if(exists && exists.price) {
     // REPORT TO ADMIN
@@ -57,9 +55,6 @@ export const handleAddContent = async (req: Request<{}, {}, IContent & { file: a
     uploaded[file.fieldname] = (data as any).secure_url
   }
 
-  console.log("DATA:", uploaded)
-
-
   // CREATE CONTENT
   const content = await Content.create({
     ...req.body,
@@ -67,9 +62,6 @@ export const handleAddContent = async (req: Request<{}, {}, IContent & { file: a
     contentUrl: uploaded.file,
     user: req.user._id,
   })
-
-  console.log("COnt:", content)
-
 
   // NOTIFY ADMIN
   const notification: INotification = {
@@ -82,8 +74,7 @@ export const handleAddContent = async (req: Request<{}, {}, IContent & { file: a
   res.status(201).send(response("Content Uploaded!", content))
 }
 
-
-// // HANDLE DELETE CONTENT [SOFT]
+// HANDLE DELETE CONTENT [SOFT]
 export const handleDeleteContent = async (req: RequestAlt, res: Response) => {
   if(!req.params.id) throw new BadRequestError("Content id is required!")
 
@@ -106,8 +97,16 @@ export const handleGetAllContents = async (req: RequestAlt, res: Response) => {
 
 // HANDLES GET USER CONTENT WITH LIKE & COMMENTS
 export const handleGetUserContents = async (req: RequestAlt, res: Response) => {
-  const contents = await getContents(req.user._id, req as any, { user: req.user._id })
+  const contents = await getContents(req.params.id, req as any, { user: req.params.id })
   res.status(200).send(response("My contents", contents))
+}
+
+// HANDLES GET USER CONTENT WITH LIKE & COMMENTS
+export const handleGetContentLikes = async (req: RequestAlt, res: Response) => {
+  const id = req.params.id
+  if(!id) throw new BadRequestError("Content id is required")
+  const likes = await Like.find({ content: id }).populate(['user', 'content'])
+  res.status(200).send(response("Content likes", likes))
 }
 
 // ROUTE: /api/v1/content/:id/react
@@ -120,8 +119,9 @@ export const handleLikeContent = async (req: RequestAlt, res: Response) => {
   if(!req.params.id) throw new BadRequestError("Content id param is required!")
 
   // CHECK IF CONTENT EXISTS
-  const content = await Content.findById(req.params.id)
+  const content = await Content.findById(req.params.id).populate(["user", "genre"])
   if(!content) throw new NotFoundError("Content does not exist!")
+
 
   // CHECK IF LIKE EXISTS
   const check = await Like.findOne({ user: req.user._id, content: req.params.id })
@@ -140,6 +140,9 @@ export const handleLikeContent = async (req: RequestAlt, res: Response) => {
       comments: contentComments
     }
 
+    // ADD NOTIFICATION
+    
+
     // SEND BACK REQUEST
     return res.status(200).send(response("Post unliked!", data))
   }
@@ -157,6 +160,13 @@ export const handleLikeContent = async (req: RequestAlt, res: Response) => {
     likes: contentLikes,
     comments: contentComments
   }
+
+  // NOTIFY USER
+  const notification: INotification = {
+    message: `<b>${req.user.username}</b> liked your content "${content.title}"`,
+    type: "content"
+  }
+  await NotifyUser(content.user!, notification)
 
   // SEND BACK REQUEST
   return res.status(200).send(response("Post liked!", data))
@@ -179,7 +189,41 @@ export const handleContentComment = async (req: RequestAlt, res: Response) => {
   })
   await comment.populate(['user', 'content'])
 
-  res.status(201).send(response("Comment created!", comment))
+  // NOTIFY USER
+  const notification: INotification = {
+    message: `<b>${req.user.username}</b> commented on your content "${content.title}"`,
+    type: "content"
+  }
+  await NotifyUser(content.user!, notification)
+
+  res.status(201).send(response("Comment posted!", comment))
+}
+
+// HANDLE COMMENT ON CONTENT
+export const handleContentCommentReply = async (req: RequestAlt, res: Response) => {
+  if(!req.params.id) throw new BadRequestError("Comment id is required!")
+  if(!req.body.comment) throw new BadRequestError("Reply is required!")
+
+  // CHECK IF CONTENT EXISTS
+  const comment = await Comment.findById(req.params.id)
+  if(!comment) throw new NotFoundError("Comment does not exist!")
+
+  // CREATE COMMENT
+  const reply = await Reply.create({
+    user: req.user._id,
+    reply: req.body.comment,
+    comment: req.params.id,
+  })
+  await reply.populate(['user', 'comment'])
+
+  // NOTIFY USER
+  const notification: INotification = {
+    message: `<b>${req.user.username}</b> replied your comment`,
+    type: "reply"
+  }
+  await NotifyUser(comment.user!, notification)
+
+  res.status(201).send(response("Comment posted!", reply))
 }
 
 // HANDLE COMMENT ON CONTENT

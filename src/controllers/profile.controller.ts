@@ -58,7 +58,6 @@ export const handleGetUserProfile = async (req: Request<{ username: any }> & Req
 
 
 
-
 // UPDATE USERS DP
 export const handleProfileImageUpload = async (req: Request<{}, {}, IUser> & RequestAlt, res: Response) => {
   if (!req.body.image) throw new BadRequestError("Image is required")
