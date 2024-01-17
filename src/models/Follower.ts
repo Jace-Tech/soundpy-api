@@ -5,11 +5,11 @@ import { IFollower } from '../types/models';
 const followerSchema = new mongoose.Schema<IFollower>({
   follower: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user"
+    ref: "User"
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user"
+    ref: "User"
   },
   date: {
     type: mongoose.Schema.Types.Date,

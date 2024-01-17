@@ -13,7 +13,7 @@ const socialLinkSchema = new mongoose.Schema<ISocialLink>({
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user"
+    ref: "User"
   }
 }, { timestamps: true });
 
