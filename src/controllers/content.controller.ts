@@ -14,6 +14,7 @@ import { getContents } from "../store/content";
 import Report from "../models/Report";
 import Transaction from "../models/Transaction";
 import Reply from "../models/Reply";
+import User from "../models/User";
 
 // HANDLES CONTENT UPLOAD
 export const handleAddContent = async (req: Request<{}, {}, IContent & { file: any }> & RequestAlt, res: Response) => {	 
@@ -98,7 +99,17 @@ export const handleGetAllContents = async (req: RequestAlt, res: Response) => {
 // HANDLES GET USER CONTENT WITH LIKE & COMMENTS
 export const handleGetUserContents = async (req: RequestAlt, res: Response) => {
   const contents = await getContents(req.params.id, req as any, { user: req.params.id })
-  res.status(200).send(response("My contents", contents))
+  res.status(200).send(response("User contents", contents))
+}
+
+// HANDLES GET USER CONTENT WITH LIKE & COMMENTS
+export const handleGetUserContentByUsername = async (req: RequestAlt, res: Response) => {
+  if(!req.params.username) throw new BadRequestError("Username is required")
+  const user = await User.findOne({ username: req.params.username })
+  if(!user) throw new NotFoundError("User doesn't exist")
+
+  const contents = await getContents(user._id, req as any, { user: user._id })
+  res.status(200).send(response("User contents", contents))
 }
 
 // HANDLES GET USER CONTENT WITH LIKE & COMMENTS

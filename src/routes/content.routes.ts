@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import roles from '../configs/roles';
 import { isActiveMiddleware } from '../middlewares/active.middleware';
-import { handleAddContent, handleBlockContent, handleContentComment, handleContentCommentReply, handleDeleteContent, handleGetAllContents, handleGetUserContents, handleLikeContent, handleReportContent, handleGetContentLikes } from '../controllers/content.controller';
+import { handleAddContent, handleBlockContent, handleContentComment, handleContentCommentReply, handleDeleteContent, handleGetAllContents, handleGetUserContents, handleLikeContent, handleReportContent, handleGetContentLikes, handleGetUserContentByUsername } from '../controllers/content.controller';
 import multer from '../utils/multer';
 
 
@@ -17,6 +17,9 @@ contentRoutes.get("/", authMiddleware(roles.USER) as any, handleGetAllContents a
 
 // GET USER CONTENT ROUTE
 contentRoutes.get("/user/:id", authMiddleware(roles.USER) as any, handleGetUserContents as any)
+
+// GET USER CONTENT ROUTE
+contentRoutes.get("/:username/user", authMiddleware(roles.USER) as any, handleGetUserContentByUsername as any)
 
 // GET USER CONTENT ROUTE
 contentRoutes.get("/:id/likes", authMiddleware(roles.USER) as any, handleGetContentLikes as any)

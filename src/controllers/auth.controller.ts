@@ -21,14 +21,12 @@ export const handleSignIn = async (req: Request<{}, {}, AuthResult>, res: Respon
   // console.log(JSON.stringify(req.body, null, 4))
   const { error, value } = userLoginValidator.validate(req.body)
   if (error) throw new BadRequestError(error.details.map(err => err.message).join(', '));
-  console.log("VALUE:", JSON.stringify(value, null, 4))
 
   // VERIFY IF USER IS A REAL PIONEER
   const headers = {
     "Authorization": `Bearer ${value.accessToken}`
   }
   const { data, status } = await axios.get(USER_ENDPOINT, { headers })
-  // console.log("DATA:", data)
   if (!(status > 100 && status < 300)) throw new NotFoundError("Pioneer not found")
 
   // CHECK IF USER ALREADY EXISTS

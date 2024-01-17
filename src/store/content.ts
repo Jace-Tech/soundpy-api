@@ -8,7 +8,6 @@ import Playlist from "../models/Playlist"
 import PurchasedContents from "../models/PurchasedContents"
 import { RequestAlt } from "../types/common"
 import Reply from "../models/Reply"
-import { IReply } from "../types/models"
 
 export const getContents = async (userId: any, req?: RequestAlt, filter?: any) => {
 
@@ -18,20 +17,20 @@ export const getContents = async (userId: any, req?: RequestAlt, filter?: any) =
 
   const contents = []
   // GET TOTAL
-  total =  await Content.find({ isDeleted: false, ...filter }).populate(["user", "genre"]).count()
+  total =  await Content.find({ isDeleted: false, ...filter }).count()
 
   // GET PAGINATED DATA
   let allContents = await Content.find({ isDeleted: false, ...filter })
     .populate(["user", "genre"])
-    .sort({ createdAt: -1 }) // Sorting in descending order based on createdAt field
+    .sort({ createdAt: -1 })
     .skip((page - 1) * perPage)
     .limit(perPage);
 
   if (req?.query.type) {
-    total = await Content.find({ isDeleted: false, type: req.query.type, ...filter }).populate(["user", "genre"]).count()
+    total = await Content.find({ isDeleted: false, type: req.query.type, ...filter }).count()
     allContents = await Content.find({ isDeleted: false, type: req.query.type, ...filter })
       .populate(["user", "genre"])
-      .sort({ createdAt: -1 }) // Sorting in descending order based on createdAt field
+      .sort({ createdAt: -1 })
       .skip((page - 1) * perPage)
       .limit(perPage);
   }

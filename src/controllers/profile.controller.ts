@@ -8,6 +8,7 @@ import { fileUpload } from "../utils/uploader";
 import { except } from "../utils/functions";
 import { Types } from "mongoose";
 import Follower from "../models/Follower";
+import { getContents } from "../store/content";
 
 
 export const getUserFollowers = async (id: any) => {
@@ -40,17 +41,22 @@ export const handleUpdateProfile = async (req: Request<{ id: any }> & RequestAlt
 
 // HANDLE GET USER'S PROFILE
 export const handleGetUserProfile = async (req: Request<{ username: any }> & RequestAlt, res: Response) => {
-  if (!req.params.username) throw new UnAuthorizedError("Username is required")
+  if (!req.params.username) throw new BadRequestError("Username is required")
 
+  // GET USER DATA
   const user = await User.findOne({ username: req.params.username }).populate("genre")
   if (!user) throw new NotFoundError("User not found")
 
   // GET USERS FOLLOWERS
   const userFollow = await getUserFollowers(user._id)
 
+  // USERS CONTENT
+  // const contents = await getContents(user._id, req as any, { user: user._id })
+
   const data = {
-    ...except(user.toObject()),
-    ...userFollow
+    ...except(user.toObject(), "password"),
+    ...userFollow,
+    // contents
   }
 
   res.status(201).send(response("Profile data!", data))
