@@ -87,6 +87,18 @@ const UserSchema = new mongoose.Schema<IUser>(
       type: String,
       default: null
     },
+    xLink: {
+      type: String,
+      default: null
+    },
+    tiktokLink: {
+      type: String,
+      default: null
+    },
+    instaLink: {
+      type: String,
+      default: null
+    },
     role: {
       type: String,
       enum: ["admin", "user"],

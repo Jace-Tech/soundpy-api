@@ -24,6 +24,9 @@ export interface IUser {
   accessToken?: string;
   email?: string;
   role?: string;
+  xLink?: string;
+  instaLink?: string;
+  tiktokLink?: string;
 }
 
 export interface INotification {

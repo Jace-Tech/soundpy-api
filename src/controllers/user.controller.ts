@@ -11,7 +11,8 @@ import { getUserFollowers } from "./profile.controller";
 
 
 // HANDLES USERS PROFILE UPDATE
-export const handleUpdateUserProfle = async (req: Request<{}, {}, IUser> & RequestAlt, res: Response) => {
+export const 
+handleUpdateUserProfle = async (req: Request<{}, {}, IUser> & RequestAlt, res: Response) => {
   if (!req.user) throw new UnAuthorizedError("Unauthorized, please login to continue")
   if (!req.body.musicCareer) throw new BadRequestError("Music career is required")
   if (!req.body.musicName) throw new BadRequestError("Music name is required")
