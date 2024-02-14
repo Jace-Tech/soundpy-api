@@ -17,6 +17,8 @@ export const handleAddToPlaylist = async (req: RequestAlt, res: Response) => {
   const playlist = await Playlist.create({ user: req.user._id, content: req.body.content })
   await playlist.populate('content');
 
+  // const content = await getContez
+
   res.status(201).send(response("Content added to playlist", playlist))
 }
 

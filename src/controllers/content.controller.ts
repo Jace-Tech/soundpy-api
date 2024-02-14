@@ -10,11 +10,13 @@ import { response } from "../utils/response";
 import BlockedContent from "../models/BlockedContent";
 import Like from "../models/Like";
 import Comment from "../models/Comment";
-import { getContents } from "../store/content";
+import { getContents, getLikesAndComment, getOneContent } from "../store/content";
 import Report from "../models/Report";
 import Transaction from "../models/Transaction";
 import Reply from "../models/Reply";
 import User from "../models/User";
+
+
 
 // HANDLES CONTENT UPLOAD
 export const handleAddContent = async (req: Request<{}, {}, IContent & { file: any }> & RequestAlt, res: Response) => {	 
@@ -96,6 +98,11 @@ export const handleGetAllContents = async (req: RequestAlt, res: Response) => {
   res.status(200).send(response("All contents", contents))
 }
 
+export const handleGetContentLikesAndComments = async (req: RequestAlt,  res: Response) => {
+  const result = await getLikesAndComment(req.params?.id as any)
+  res.status(200).send(response("Likes and comment", result))
+}
+
 // HANDLES GET USER CONTENT WITH LIKE & COMMENTS
 export const handleGetUserContents = async (req: RequestAlt, res: Response) => {
   const contents = await getContents(req.params.id, req as any, { user: req.params.id })
@@ -140,19 +147,8 @@ export const handleLikeContent = async (req: RequestAlt, res: Response) => {
     // DELETE LIKE
     await check.delete()
     
-    // GET CONTENT'S LIKE AND COMMENTS
-    const contentLikes = await Like.find({ content: req.params.id }).populate(['user', 'content'])
-    const contentComments = await Comment.find({ content: req.params.id }).populate(['user', 'content'])
-
     // UPDATE THE DATA OBJECT
-    const data = {
-      ...content.toObject(),
-      likes: contentLikes,
-      comments: contentComments
-    }
-
-    // ADD NOTIFICATION
-    
+    const data = await getOneContent(req.params.id, req)
 
     // SEND BACK REQUEST
     return res.status(200).send(response("Post unliked!", data))
@@ -161,16 +157,8 @@ export const handleLikeContent = async (req: RequestAlt, res: Response) => {
   // LIKE POST
   await Like.create({ user: req.user._id, content: req.params.id })
 
-  // GET CONTENT'S LIKE AND COMMENTS
-  const contentLikes = await Like.find({ content: req.params.id }).populate(['user', 'content'])
-  const contentComments = await Comment.find({ content: req.params.id }).populate(['user', 'content'])
-
   // UPDATE THE DATA OBJECT
-  const data = {
-    ...content.toObject(),
-    likes: contentLikes,
-    comments: contentComments
-  }
+  const data = await getOneContent(req.params.id, req)
 
   // NOTIFY USER
   const notification: INotification = {
