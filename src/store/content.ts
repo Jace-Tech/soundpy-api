@@ -51,7 +51,8 @@ export const getContents = async (userId: any, req?: RequestAlt, filter?: any) =
     const playlists = await Playlist.find({ content: content._id }).count()
     const isPurchased = await PurchasedContents.findOne({ user: req?.user._id, content: content._id })
     const isLiked = await Like.findOne({ user: req?.user._id, content: content._id })
-    const isMine = await Like.findOne({ user: req?.user._id, content: content._id })
+    const isMine = String((content.toObject().user as any)._id) == String(req?.user._id)
+    // console.log("USER OBJ:",  String  ((content.toObject().user as any)._id))
 
 
     contents.push({
@@ -82,7 +83,8 @@ export const getOneContent = async (id: any, req?: RequestAlt) => {
   const playlists = await Playlist.find({ content: id }).count()
   const isPurchased = await PurchasedContents.findOne({ user: req?.user._id, content: id })
   const isLiked = await Like.findOne({ user: req?.user._id, content: id })
-  const isMine = await Like.findOne({ user: req?.user._id, content: id })
+  const isMine = String((item.toObject().user as any)._id) == String(req?.user._id)
+  // console.log("USER OBJ:",  (item.toObject().user as any)._id)
 
   
   const contents = {
