@@ -11,7 +11,8 @@ const genreRoutes = Router();
 genreRoutes.post("/", authMiddleware(roles.ADMIN) as any, handleAddGenre as any) // TODO: rem
 
 // ALL GENRE ROUTE
-genreRoutes.get("/", authMiddleware(roles.USER) as any, handleGetAllGenres as any)
+// genreRoutes.get("/", authMiddleware(roles.USER) as any, handleGetAllGenres as any)
+genreRoutes.get("/", handleGetAllGenres as any)
 
 // UPDATE GENRE ROUTE
 genreRoutes.route("/:id")
